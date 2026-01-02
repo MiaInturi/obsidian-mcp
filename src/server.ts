@@ -5,6 +5,8 @@ import { NOTES_TOOLS } from "./tools/index.ts";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { ErrorCode } from "@modelcontextprotocol/sdk/types.js";
 
+import { env } from "./env.ts";
+
 const createServer = () => {
   const server = new McpServer({
     name: "obsidian-mcp",
@@ -25,10 +27,7 @@ const createServer = () => {
   return server;
 };
 
-const HOST = "127.0.0.1";
-const PORT = 3333;
-
-const app = createMcpExpressApp({ host: HOST });
+const app = createMcpExpressApp({ host: env.HOST });
 
 app.post("/mcp", async (req, res) => {
   const server = createServer();
@@ -83,6 +82,8 @@ app.delete("/mcp", async (_req, res) => {
   );
 });
 
-app.listen(PORT, HOST, () => {
-  console.log(`Obsidian MCP Server running on http://${HOST}:${PORT}`);
+app.listen(env.PORT, env.HOST, () => {
+  console.log(
+    `Obsidian MCP Server running on http://${env.HOST}:${env.PORT}`
+  );
 });
