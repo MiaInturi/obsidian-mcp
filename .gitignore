@@ -1,0 +1,8 @@
+# IDE
+.cursor
+
+# Dependencies
+node_modules
+
+# Build
+dist
