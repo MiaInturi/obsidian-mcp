@@ -10,6 +10,7 @@ RUN yarn tsc --noEmit
 
 ENV HOST=0.0.0.0
 ENV PORT=3333
+ENV NOTES_PATH=
 
 EXPOSE 3333
 

@@ -2,6 +2,7 @@ import z from "zod";
 import fs from "fs/promises";
 import path from "path";
 
+import { env } from "../env.ts";
 import {
   formatError,
   isErrnoException,
@@ -32,6 +33,8 @@ const defineTool = <InputSchema extends z.ZodRawShape | undefined>(args: {
   };
 };
 
+const NOTES_ROOT = path.resolve(process.cwd(), env.NOTES_PATH);
+
 export const NOTES_TOOLS = {
   getNotes: defineTool({
     name: "get_notes",
@@ -40,7 +43,7 @@ export const NOTES_TOOLS = {
       query: z.string().describe("The query to search for notes").default(""),
     },
     async tool(args) {
-      const files = await fs.readdir(path.resolve(process.cwd(), "mocks"));
+      const files = await fs.readdir(NOTES_ROOT);
       const query = args.query.trim().toLowerCase();
       const matches = files.filter((name) =>
         name.toLowerCase().includes(query)
@@ -58,7 +61,7 @@ export const NOTES_TOOLS = {
     },
     async tool(args) {
       const content = await fs.readFile(
-        path.resolve(process.cwd(), "mocks", args.fileName),
+        path.resolve(NOTES_ROOT, args.fileName),
         "utf-8"
       );
 
@@ -74,7 +77,7 @@ export const NOTES_TOOLS = {
       content: z.string().describe("The content of the note"),
     },
     async tool(args) {
-      const notePath = path.resolve(process.cwd(), "mocks", args.fileName);
+      const notePath = path.resolve(NOTES_ROOT, args.fileName);
 
       try {
         await fs.stat(notePath);
