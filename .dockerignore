@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+yarn-error.log
+.pnp.*
+.yarn
+.git
+.gitignore
+.vscode
+.cursor
+.DS_Store
+.env
+.env.*
+dist
+coverage
+mocks

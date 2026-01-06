@@ -44,6 +44,16 @@ Connect to this server using any MCP-compatible client. The server uses Streamab
 
 Example connection URL: `http://127.0.0.1:3333/mcp`
 
+## Environment Variables
+
+- `HOST` (optional): Host interface to bind (default: `127.0.0.1`).
+- `PORT` (optional): Port to listen on (default: `3333`).
+- `NOTES_PATH` (required): Path to the directory with Obsidian notes. Must be non-empty.
+
+## Docker
+
+The Docker image is configured via environment variables. Provide `NOTES_PATH` at runtime.
+
 ## License
 
 MIT
