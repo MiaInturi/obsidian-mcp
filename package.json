@@ -4,7 +4,7 @@
   "description": "MCP server for Obsidian vault file operations",
   "type": "module",
   "scripts": {
-    "dev": "NOTES_PATH=mocks node -watch src/server.ts",
+    "dev": "NOTES_PATH=mocks node --watch src/server.ts",
     "start": "node src/server.ts"
   },
   "author": "",
