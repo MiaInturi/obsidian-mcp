@@ -83,7 +83,5 @@ app.delete("/mcp", async (_req, res) => {
 });
 
 app.listen(env.PORT, env.HOST, () => {
-  console.log(
-    `Obsidian MCP Server running on http://${env.HOST}:${env.PORT}`
-  );
+  console.log(`Obsidian MCP Server running on http://${env.HOST}:${env.PORT}`);
 });
