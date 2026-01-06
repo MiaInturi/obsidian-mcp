@@ -2,15 +2,12 @@ import z from "zod";
 import fs from "fs/promises";
 import path from "path";
 
-import {
-  formatError,
-  isErrnoException,
-  toTextResult,
-} from "../helpers/index.ts";
+import { formatError, toTextResult } from "../helpers/index.ts";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 import {
   checkFileExistence,
+  isErrnoException,
   normalizeEOL,
   validateFilename,
 } from "./helpers/index.ts";
@@ -127,7 +124,6 @@ export const NOTES_TOOLS = {
           });
         }
 
-      
         // TODO: idk should we create notes root if it doesn't exist?
         await fs.mkdir(NOTES_ROOT, { recursive: true });
 

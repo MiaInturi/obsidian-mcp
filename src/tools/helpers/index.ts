@@ -18,7 +18,3 @@ export const formatError = (error: unknown): string => {
 
   return String(error);
 };
-
-export const isErrnoException = (
-  error: unknown
-): error is NodeJS.ErrnoException => error instanceof Error && "code" in error;
