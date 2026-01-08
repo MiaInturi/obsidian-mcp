@@ -1,18 +1,18 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "lib": ["ESNext"],
-    "moduleResolution": "NodeNext",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "erasableSyntaxOnly": true,
-    "resolveJsonModule": true
-  },
-  "include": ["src/**/*", "types/**/*"],
-  "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"target": "ESNext",
+		"lib": ["ESNext"],
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"resolveJsonModule": true,
+		"allowImportingTsExtensions": true,
+		"strict": true,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"erasableSyntaxOnly": true,
+		"skipLibCheck": true
+	},
+	"include": ["src/**/*", "types/**/*"],
+	"exclude": ["node_modules", "dist"]
 }
