@@ -9,9 +9,9 @@
 	"scripts": {
 		"dev": "NOTES_PATH=mocks node --watch src/server.ts",
 		"start": "node src/server.ts",
-		"lint": "oxlint .",
-		"format": "oxfmt .",
-		"format:check": "oxfmt --check ."
+		"check": "biome check --write .",
+		"lint": "biome lint --write .",
+		"format": "biome format --write ."
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.0.0",
