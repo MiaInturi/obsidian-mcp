@@ -1,0 +1,45 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
+
+	"formatter": {
+		"lineWidth": 120
+	},
+
+	"linter": {
+		"enabled": true,
+		"domains": {
+			"project": "all"
+		},
+		"rules": {
+			"suspicious": {
+				"noExplicitAny": "warn"
+			}
+		}
+	},
+
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"trailingCommas": "none"
+		}
+	},
+
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": {
+					"level": "on",
+					"options": {
+						"groups": [":NODE:", ":BLANK_LINE:", ":PACKAGE:", ":BLANK_LINE:", ":ALIAS:", ":BLANK_LINE:", ":PATH:"]
+					}
+				}
+			}
+		}
+	}
+}

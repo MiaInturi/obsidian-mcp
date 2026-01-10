@@ -6,3 +6,7 @@ node_modules
 
 # Build
 dist
+
+# Dev
+mocks
+!mocks/.gitkeep

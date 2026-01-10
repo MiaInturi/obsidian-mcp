@@ -1,1 +1,1 @@
-export * from "./notes/index.ts";
+export * from './notes/index.ts';
