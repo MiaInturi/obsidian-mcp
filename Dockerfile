@@ -2,11 +2,11 @@ FROM node:24.12.0-alpine
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile && yarn cache clean
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --prod --frozen-lockfile
 
 COPY . .
-RUN yarn tsc --noEmit
+RUN pnpm tsc --noEmit
 
 ENV HOST=0.0.0.0
 ENV PORT=3333
