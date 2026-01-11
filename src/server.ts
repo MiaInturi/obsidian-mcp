@@ -17,7 +17,8 @@ const createServer = () => {
 			tool.name,
 			{
 				description: tool.description,
-				inputSchema: tool.inputSchema
+				inputSchema: tool.inputSchema,
+				outputSchema: tool.outputSchema
 			},
 			tool.tool
 		);
@@ -26,7 +27,11 @@ const createServer = () => {
 	return server;
 };
 
-const app = createMcpExpressApp({ host: env.HOST });
+// TODO what is DNS rebinding protection?
+const app = createMcpExpressApp({
+	host: env.HOST,
+	allowedHosts: ['localhost', '127.0.0.1', '[::1]']
+});
 
 app.post('/mcp', async (req, res) => {
 	const server = createServer();

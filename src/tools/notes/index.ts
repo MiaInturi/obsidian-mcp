@@ -4,16 +4,26 @@ import path from 'node:path';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import z from 'zod';
 
-import { formatError, toTextResult } from '../helpers/index.ts';
+import { formatError, toStructuredResult, toUnstructuredResult } from '../helpers/index.ts';
 import { NOTES_ROOT, PERSMISSION_ERROR_CODES } from './constants/index.ts';
-import { checkFileExistence, isErrnoException, normalizeEOL, validateFilename } from './helpers/index.ts';
+import {
+	checkFileExistence,
+	isErrnoException,
+	listMarkdownNotePaths,
+	normalizeEOL,
+	validateFilename
+} from './helpers/index.ts';
 
 // Important:
 // this function only for type inference, it's not a real tool
-const defineTool = <InputSchema extends z.ZodRawShape | undefined>(args: {
+const defineTool = <
+	InputSchema extends z.ZodRawShape | undefined,
+	OutputSchema extends z.ZodRawShape | z.ZodType | undefined
+>(args: {
 	name: string;
 	description: string;
 	inputSchema?: InputSchema;
+	outputSchema?: OutputSchema;
 	tool: InputSchema extends z.ZodRawShape
 		? (args: z.infer<z.ZodObject<InputSchema>>) => Promise<CallToolResult>
 		: () => Promise<CallToolResult>;
@@ -25,7 +35,7 @@ const defineTool = <InputSchema extends z.ZodRawShape | undefined>(args: {
 				// @ts-expect-error — this is a workaround to type the tool callback correctly
 				return await args.tool(...params);
 			} catch (error) {
-				return toTextResult({ text: formatError(error), isError: true });
+				return toUnstructuredResult({ text: formatError(error), isError: true });
 			}
 		}
 	};
@@ -38,12 +48,15 @@ export const NOTES_TOOLS = {
 		inputSchema: {
 			query: z.string().describe('The query to search for notes').default('')
 		},
+		outputSchema: {
+			notes: z.array(z.string()).describe('The list of notes')
+		},
 		async tool(args) {
-			const files = await fs.readdir(NOTES_ROOT);
 			const query = args.query.trim().toLowerCase();
-			const matches = files.filter((name) => name.toLowerCase().includes(query));
+			const notes = await listMarkdownNotePaths({ rootDir: NOTES_ROOT, ignorePatterns: ['.trash'] });
+			const filteredNotes = query ? notes.filter((note: string) => note.toLowerCase().includes(query)) : notes;
 
-			return toTextResult({ text: JSON.stringify(matches, null, 2) });
+			return toStructuredResult({ data: { notes: filteredNotes } });
 		}
 	}),
 
@@ -56,7 +69,7 @@ export const NOTES_TOOLS = {
 		async tool(args) {
 			const content = await fs.readFile(path.resolve(NOTES_ROOT, args.fileName), 'utf-8');
 
-			return toTextResult({ text: content });
+			return toUnstructuredResult({ text: content });
 		}
 	}),
 
@@ -71,14 +84,14 @@ export const NOTES_TOOLS = {
 			const notePath = path.resolve(NOTES_ROOT, args.fileName);
 
 			if (await checkFileExistence(notePath)) {
-				return toTextResult({
+				return toUnstructuredResult({
 					text: `Note with filename "${args.fileName}" already exists.`,
 					isError: true
 				});
 			}
 
 			await fs.writeFile(notePath, args.content, 'utf-8');
-			return toTextResult({
+			return toUnstructuredResult({
 				text: `Note "${args.fileName}" created successfully.`
 			});
 		}
@@ -95,7 +108,7 @@ export const NOTES_TOOLS = {
 		async tool(args) {
 			const validation = validateFilename(args.fileName);
 			if (!validation.success) {
-				return toTextResult({ text: validation.reason, isError: true });
+				return toUnstructuredResult({ text: validation.reason, isError: true });
 			}
 
 			try {
@@ -106,7 +119,7 @@ export const NOTES_TOOLS = {
 					const message = isNoteExists
 						? `Confirmation required to edit "${args.fileName}". Do you want to overwrite it? Re-run edit_note with confirmed=true to proceed.`
 						: `Note "${args.fileName}" does not exist. Do you want to create it? Re-run edit_note with confirmed=true to proceed.`;
-					return toTextResult({
+					return toUnstructuredResult({
 						text: message,
 						isError: true
 					});
@@ -129,18 +142,18 @@ export const NOTES_TOOLS = {
 				try {
 					await fs.rename(tmpPath, notePath);
 				} catch (error) {
-					await fs.unlink(tmpPath).catch(() => {});
+					await fs.unlink(tmpPath);
 					throw error;
 				}
 
-				return toTextResult({
+				return toUnstructuredResult({
 					text: isNoteExists
 						? `Note "${args.fileName}" updated successfully.`
 						: `Note "${args.fileName}" created successfully.`
 				});
 			} catch (error) {
 				if (isErrnoException(error) && PERSMISSION_ERROR_CODES.includes(error.code)) {
-					return toTextResult({
+					return toUnstructuredResult({
 						text: 'Impossible to edit: note is read-only.',
 						isError: true
 					});
