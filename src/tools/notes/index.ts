@@ -125,9 +125,6 @@ export const NOTES_TOOLS = {
 					});
 				}
 
-				// TODO: idk should we create notes root if it doesn't exist?
-				await fs.mkdir(NOTES_ROOT, { recursive: true });
-
 				const noteDir = path.dirname(notePath);
 				await fs.mkdir(noteDir, { recursive: true });
 

@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+
 import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -5,6 +7,23 @@ import { ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 
 import { env } from './env.ts';
 import { NOTES_TOOLS } from './tools/index.ts';
+import { NOTES_ROOT } from './tools/notes/constants/index.ts';
+
+const ensureNotesRootExists = () => {
+	try {
+		const stats = fs.statSync(NOTES_ROOT);
+		if (!stats.isDirectory()) {
+			throw new Error('NOTES_ROOT is not a directory.');
+		}
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		console.error(`Failed to start server: ${message}`);
+		console.error(`NOTES_ROOT path: ${NOTES_ROOT}`);
+		process.exit(1);
+	}
+};
+
+ensureNotesRootExists();
 
 const createServer = () => {
 	const server = new McpServer({
@@ -27,7 +46,6 @@ const createServer = () => {
 	return server;
 };
 
-// TODO what is DNS rebinding protection?
 const app = createMcpExpressApp({
 	host: env.HOST,
 	allowedHosts: ['localhost', '127.0.0.1', '[::1]']
