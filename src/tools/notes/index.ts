@@ -97,6 +97,85 @@ export const NOTES_TOOLS = {
 		}
 	}),
 
+	appendNote: defineTool({
+		name: 'append_note',
+		description: 'Append content after a specific line in an existing note',
+		inputSchema: {
+			fileName: z.string().describe('The name of the note to edit'),
+			line: z.number().int().min(1).describe('The 1-based line number to append after'),
+			content: z.string().describe('The content to append'),
+			confirmed: z.boolean().describe('Whether appending to the note is confirmed')
+		},
+		async tool(args) {
+			const validation = validateFilename(args.fileName);
+			if (!validation.success) {
+				return toUnstructuredResult({ text: validation.reason, isError: true });
+			}
+
+			try {
+				const notePath = path.resolve(NOTES_ROOT, args.fileName);
+				const isNoteExists = await checkFileExistence(notePath);
+
+				if (!isNoteExists) {
+					return toUnstructuredResult({
+						text: `Note "${args.fileName}" does not exist.`,
+						isError: true
+					});
+				}
+
+				if (!args.confirmed) {
+					return toUnstructuredResult({
+						text: `Confirmation required to append to "${args.fileName}". Re-run append_note with confirmed=true to proceed.`,
+						isError: true
+					});
+				}
+
+				const existingContent = await fs.readFile(notePath, 'utf-8');
+				const normalizedExistingContent = normalizeEOL(existingContent);
+				const existingLines = normalizedExistingContent.split('\n');
+
+				if (args.line < 1 || args.line > existingLines.length) {
+					return toUnstructuredResult({
+						text: `Line ${args.line} is out of range. The note has ${existingLines.length} lines.`,
+						isError: true
+					});
+				}
+
+				const normalizedAppendContent = normalizeEOL(args.content, { trimTrailingEmptyLines: false });
+				const appendLines = normalizedAppendContent.length ? normalizedAppendContent.split('\n') : [];
+
+				const updatedLines = existingLines.splice(args.line, 0, ...appendLines);
+				const updatedContent = updatedLines.join('\n');
+				const tmpPath = `${notePath}.tmp.${Date.now()}`;
+
+				await fs.writeFile(tmpPath, updatedContent, {
+					encoding: 'utf-8',
+					flag: 'wx'
+				});
+
+				try {
+					await fs.rename(tmpPath, notePath);
+				} catch (error) {
+					await fs.unlink(tmpPath);
+					throw error;
+				}
+
+				return toUnstructuredResult({
+					text: `Content appended to "${args.fileName}" successfully.`
+				});
+			} catch (error) {
+				if (isErrnoException(error) && PERSMISSION_ERROR_CODES.includes(error.code)) {
+					return toUnstructuredResult({
+						text: 'Impossible to append: note is read-only.',
+						isError: true
+					});
+				}
+
+				throw error;
+			}
+		}
+	}),
+
 	editNote: defineTool({
 		name: 'edit_note',
 		description: 'Edit or create a note with given file name and content',

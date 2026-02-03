@@ -38,6 +38,15 @@ Create a new note with the given file name and content.
 - `fileName` (string, required): The name of the note file (e.g., "My Note.md")
 - `content` (string, required): The content of the note in markdown format
 
+### `append_note`
+Append content after a specific line in an existing note. Returns an error if the note does not exist or the line is out of range.
+
+**Parameters:**
+- `fileName` (string, required): The name of the note file (e.g., "My Note.md")
+- `line` (number, required): The 1-based line number to append after
+- `content` (string, required): The content to append in markdown format
+- `confirmed` (boolean, required): Whether appending to the note is confirmed
+
 ## Usage with MCP Clients
 
 Connect to this server using any MCP-compatible client. The server uses Streamable HTTP for the transport layer over HTTP.
