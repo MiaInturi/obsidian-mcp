@@ -144,7 +144,7 @@ export const NOTES_TOOLS = {
 				const normalizedAppendContent = normalizeEOL(args.content, { trimTrailingEmptyLines: false });
 				const appendLines = normalizedAppendContent.length ? normalizedAppendContent.split('\n') : [];
 
-				const updatedLines = existingLines.splice(args.line, 0, ...appendLines);
+				const updatedLines = [...existingLines.slice(0, args.line), ...appendLines, ...existingLines.slice(args.line)];
 				const updatedContent = updatedLines.join('\n');
 				const tmpPath = `${notePath}.tmp.${Date.now()}`;
 
